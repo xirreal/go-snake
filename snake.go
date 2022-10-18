@@ -35,7 +35,7 @@ func Repeat(x int, y int) int {
 	return x
 }
 
-func readKeyboard(dir *Direction, snakeHead *string) {
+func readKeyboard(dir *Direction, lastDir *Direction, snakeHead *string) {
 	keysEvents, err := keyboard.GetKeys(10)
 	if err != nil {
 		panic(err)
@@ -51,22 +51,22 @@ func readKeyboard(dir *Direction, snakeHead *string) {
 			panic(event.Err)
 		}
 
-		if event.Key == keyboard.KeyArrowDown && dir.y == 0 {
+		if event.Key == keyboard.KeyArrowDown && lastDir.y == 0 {
 			dir.x = 0
 			dir.y = 1
 			*snakeHead = "👇"
 		}
-		if event.Key == keyboard.KeyArrowUp && dir.y == 0 {
+		if event.Key == keyboard.KeyArrowUp && lastDir.y == 0 {
 			dir.x = 0
 			dir.y = -1
 			*snakeHead = "👆"
 		}
-		if event.Key == keyboard.KeyArrowLeft && dir.x == 0 {
+		if event.Key == keyboard.KeyArrowLeft && lastDir.x == 0 {
 			dir.y = 0
 			dir.x = -1
 			*snakeHead = "👈"
 		}
-		if event.Key == keyboard.KeyArrowRight && dir.x == 0 {
+		if event.Key == keyboard.KeyArrowRight && lastDir.x == 0 {
 			dir.y = 0
 			dir.x = 1
 			*snakeHead = "👉"
@@ -108,6 +108,7 @@ func main() {
 	playerPosition := Position{0, 0}
 	foodPosition := Position{rand.Int() % _WIDTH, rand.Int() % _HEIGHT}
 	direction := Direction{1, 0}
+	lastDirection := Direction{1, 0}
 	score := 24
 	snakeHead := "👉"
 
@@ -126,7 +127,7 @@ func main() {
 	field[playerPosition.y][playerPosition.x] = score
 	field[foodPosition.y][foodPosition.x] = -1
 
-	go readKeyboard(&direction, &snakeHead)
+	go readKeyboard(&direction, &lastDirection, &snakeHead)
 
 	drawBox(_WIDTH, _HEIGHT)
 
@@ -168,6 +169,7 @@ func main() {
 			}
 		}
 
+		lastDirection = direction
 		playerPosition.x += direction.x
 		playerPosition.y += direction.y
 
