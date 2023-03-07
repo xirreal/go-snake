@@ -54,22 +54,23 @@ func readKeyboard(dir *Direction, lastDir *Direction, snakeHead *string) {
 		if event.Key == keyboard.KeyArrowDown && lastDir.y == 0 {
 			dir.x = 0
 			dir.y = 1
-			*snakeHead = "👇"
+			// triangle down
+			*snakeHead = "▼"
 		}
 		if event.Key == keyboard.KeyArrowUp && lastDir.y == 0 {
 			dir.x = 0
 			dir.y = -1
-			*snakeHead = "👆"
+			*snakeHead = "▲"
 		}
 		if event.Key == keyboard.KeyArrowLeft && lastDir.x == 0 {
 			dir.y = 0
 			dir.x = -1
-			*snakeHead = "👈"
+			*snakeHead = "◀"
 		}
 		if event.Key == keyboard.KeyArrowRight && lastDir.x == 0 {
 			dir.y = 0
 			dir.x = 1
-			*snakeHead = "👉"
+			*snakeHead = "▶"
 		}
 		if event.Key == keyboard.KeyEsc || event.Rune == 'q' || event.Rune == 'Q' {
 			fmt.Println(cursor.MoveTo(_HEIGHT+3, 0))
@@ -86,10 +87,6 @@ func drawBox(width int, height int) {
 		fmt.Println("│ " + strings.Repeat(" ", (width*2)) + " │")
 	}
 	fmt.Println("└" + strings.Repeat("─", (width*2)+2) + "┘")
-}
-
-var emojis [90]string = [90]string{
-	"👆", "😂", "😝", "😁", "😱", "👉", "🙌", "🍻", "🔥", "🌈", "🎈", "🌹", "💄", "🎀", "⚽", "🎾", "🏁", "😡", "👿", "🐻", "🐶", "🐬", "🐟", "🍀", "👀", "🚗", "🍎", "💝", "💙", "👌", "😍", "😉", "😓", "😳", "💪", "💩", "🍸", "🔑", "💖", "🌟", "🎉", "🌺", "🎶", "👠", "🏈", "⚾", "🏆", "👽", "💀", "🐵", "🐮", "🐩", "🐎", "💣", "👃", "👂", "🍓", "💘", "💜", "👊", "💋", "😘", "😜", "😵", "🙏", "👋", "🚽", "💃", "💎", "🚀", "🌙", "🎁", "⛄", "🌊", "⛵", "🏀", "🎱", "💰", "👶", "👸", "🐰", "🐷", "🐍", "🐫", "🔫", "👄", "🚲", "🍉", "💛", "💚",
 }
 
 func main() {
@@ -110,7 +107,7 @@ func main() {
 	direction := Direction{1, 0}
 	lastDirection := Direction{1, 0}
 	score := 24
-	snakeHead := "👉"
+	snakeHead := "▶"
 
 	field := make([][]int, _HEIGHT)
 	for i := 0; i < _HEIGHT; i++ {
@@ -156,14 +153,18 @@ func main() {
 		for h := 0; h < _HEIGHT; h++ {
 			for w := 0; w < _WIDTH; w++ {
 				if field[h][w] > 0 {
-					fmt.Print(cursor.MoveTo(h+2, w+w+3), emojis[field[h][w]%90])
+					if field[h][w] == score {
+						fmt.Print(cursor.MoveTo(h+2, w+w+3), "\033[38;5;200m"+snakeHead+"\033[0m")
+					} else {
+						fmt.Print(cursor.MoveTo(h+2, w+w+3), "\033[38;5;200m▓\033[0m")
+					}
 					field[h][w]--
 					needsUpdate[h][w] = true
 				} else if field[h][w] == -1 && needsUpdate[h][w] {
-					fmt.Print(cursor.MoveTo(h+2, w+w+3), "🍖")
+					fmt.Print(cursor.MoveTo(h+2, w+w+3), "\033[32mO\033[0m")
 					needsUpdate[h][w] = false
 				} else if needsUpdate[h][w] {
-					fmt.Print(cursor.MoveTo(h+2, w+w+3), "•")
+					fmt.Print(cursor.MoveTo(h+2, w+w+3), ".")
 					needsUpdate[h][w] = false
 				}
 			}
@@ -173,8 +174,19 @@ func main() {
 		playerPosition.x += direction.x
 		playerPosition.y += direction.y
 
-		if playerPosition.x < 0 || playerPosition.x >= _WIDTH || playerPosition.y < 0 || playerPosition.y >= _HEIGHT || field[playerPosition.y][playerPosition.x] > 0 {
-			fmt.Print(cursor.MoveTo(playerPosition.y+2, playerPosition.x+playerPosition.x+3) + cursor.Esc + "[31m❌" + cursor.Esc + "[0m")
+		// Loop over edges
+		if playerPosition.x < 0 {
+			playerPosition.x = _WIDTH - 1
+		} else if playerPosition.x >= _WIDTH {
+			playerPosition.x = 0
+		} else if playerPosition.y < 0 {
+			playerPosition.y = _HEIGHT - 1
+		} else if playerPosition.y >= _HEIGHT {
+			playerPosition.y = 0
+		}
+
+		if field[playerPosition.y][playerPosition.x] > 0 {
+			fmt.Print(cursor.MoveTo(playerPosition.y+2, playerPosition.x+playerPosition.x+3) + cursor.Esc + "[31mX" + cursor.Esc + "[0m")
 			fmt.Print(cursor.MoveTo(_HEIGHT/2+2, _WIDTH-3) + cursor.Esc + "[41m  YOU LOSE  " + cursor.Esc + "[0m")
 			fmt.Print(cursor.MoveTo(_HEIGHT+4, 0))
 			os.Exit(0)
