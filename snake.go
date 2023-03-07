@@ -28,8 +28,8 @@ type Direction struct {
 
 func Repeat(x int, y int) int {
 	if x < 0 {
-		return y
-	} else if x > y {
+		return y - 1
+	} else if x >= y {
 		return 0
 	}
 	return x
@@ -174,16 +174,8 @@ func main() {
 		playerPosition.x += direction.x
 		playerPosition.y += direction.y
 
-		// Loop over edges
-		if playerPosition.x < 0 {
-			playerPosition.x = _WIDTH - 1
-		} else if playerPosition.x >= _WIDTH {
-			playerPosition.x = 0
-		} else if playerPosition.y < 0 {
-			playerPosition.y = _HEIGHT - 1
-		} else if playerPosition.y >= _HEIGHT {
-			playerPosition.y = 0
-		}
+		playerPosition.x = Repeat(playerPosition.x, _WIDTH)
+		playerPosition.y = Repeat(playerPosition.y, _HEIGHT)
 
 		if field[playerPosition.y][playerPosition.x] > 0 {
 			fmt.Print(cursor.MoveTo(playerPosition.y+2, playerPosition.x+playerPosition.x+3) + cursor.Esc + "[31mX" + cursor.Esc + "[0m")
