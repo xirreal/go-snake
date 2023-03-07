@@ -141,6 +141,7 @@ func main() {
 			if score == _WIDTH*_HEIGHT {
 				fmt.Println(cursor.MoveTo(_HEIGHT/2+2, _WIDTH) + cursor.Esc + "[42m" + cursor.Esc + "[30m  YOU WIN  " + cursor.Esc + "[0m")
 				fmt.Print(cursor.MoveTo(_HEIGHT+4, 0))
+				fmt.Print(cursor.Show())
 				os.Exit(0)
 			}
 			field[foodPosition.y][foodPosition.x] = score
@@ -181,6 +182,7 @@ func main() {
 			fmt.Print(cursor.MoveTo(playerPosition.y+2, playerPosition.x+playerPosition.x+3) + cursor.Esc + "[31mX" + cursor.Esc + "[0m")
 			fmt.Print(cursor.MoveTo(_HEIGHT/2+2, _WIDTH-3) + cursor.Esc + "[41m  YOU LOSE  " + cursor.Esc + "[0m")
 			fmt.Print(cursor.MoveTo(_HEIGHT+4, 0))
+			fmt.Print(cursor.Show())
 			os.Exit(0)
 		}
 
